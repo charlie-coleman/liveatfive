@@ -1,5 +1,16 @@
 body, html {
   font-family: sans-serif;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+article {
+  flex: 1;
 }
 
 #record {
@@ -13,6 +24,11 @@ body, html {
   margin-left: auto;
   margin-right: auto;
   display: inline-block;
+}
+
+#notes {
+  padding: 20px;
+  font-weight: bold;
 }
 
 .history-entry {

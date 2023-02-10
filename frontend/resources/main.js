@@ -30,8 +30,10 @@ function populateRecord(text)
 {
   var respJson = JSON.parse(text);
 
-  var recordDiv = `itswill has been on time for {0} out of the {1} streams since January 1st 2023.`.format(respJson["on-time"], respJson["total"]);
-  $("#record").text(recordDiv);
+  var recordDiv = `itswill has been on time for {0} out of the {1} streams since January 1st, 2023.
+  <br>
+  itswill has been early for {2} out of the {1} streams since January 1st, 2023`.format(respJson["on-time"], respJson["total"], respJson["early"]);
+  $("#record").append(recordDiv);
 }
 
 function populateHistory(text)
@@ -52,13 +54,17 @@ function populateHistory(text)
 
     var liveString = ""
     
-    if (value["on_time"])
+    if (value["on_time"] == 2)
     {
-      liveString = "On time"
+      liveString = "EARLY&nbsp;&nbsp;"
+    }
+    else if (value["on_time"] == 1)
+    {
+      liveString = "ON TIME"
     }
     else
     {
-      liveString = "Not on time"
+      liveString = "LATE&nbsp;&nbsp;&nbsp;"
     }
 
     $("#history").append(`<div class="history-entry" id="entry-{0}">{1}: {2} (went live at {3})</div>`.format(idx, key, liveString, value["time"]));

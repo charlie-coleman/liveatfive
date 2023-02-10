@@ -16,7 +16,7 @@ from util.at_five import *
 class API_DataStore():
   TWITCH_API = None
   LOCAL_TZ = None
-  DATA_TIMEOUT = 6000
+  DATA_TIMEOUT = 300
 
   RESULTS_FILEPATH = "./results.csv"
   RESULTS = dict()
@@ -36,15 +36,15 @@ def update_results():
 
 def calc_record():
   ontime = 0
-  late = 0
+  early = 0
   total = 0
   for d, r in data.RESULTS.items():
     total += 1
-    if r[0]:
+    if r[0] == Punctuality.ONTIME:
       ontime += 1
-    else:
-      late += 1
-  return (ontime, late, total)
+    elif r[0] == Punctuality.EARLY:
+      early += 1
+  return (ontime, early, total)
 
 @app.route('/', methods=['GET'])
 @cross_origin()
@@ -56,10 +56,10 @@ def home():
 def get_record():
   if (data.RESULTS_AGE is None) or ((dt.datetime.now() - data.RESULTS_AGE).total_seconds() > data.DATA_TIMEOUT):
     update_results()
-  ot, l, t = calc_record()
+  o, e, t = calc_record()
   resp = {
-    'on-time': ot,
-    'late': l,
+    'on-time': o,
+    'early': e,
     'total': t
   }
   return flask.jsonify(resp)
@@ -73,7 +73,7 @@ def get_history():
   streams = dict()
   for k, v in data.RESULTS.items():
     streams[k] = dict()
-    streams[k]["on_time"] = v[0]
+    streams[k]["on_time"] = v[0].value
     streams[k]["time"] = v[1].isoformat()
 
   resp = { 'streams': streams }
@@ -104,4 +104,4 @@ if __name__ == '__main__':
 
   update_results()
 
-  app.run(host=args.host, port=args.port, debug=False)
+  app.run(host=args.host, port=args.port, debug=True)
