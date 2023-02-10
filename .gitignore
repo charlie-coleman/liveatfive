@@ -132,4 +132,4 @@ dmypy.json
 secrets.json
 
 # Results
-results/
+results/*
