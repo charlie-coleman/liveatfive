@@ -57,12 +57,15 @@ def get_record():
   if (data.RESULTS_AGE is None) or ((dt.datetime.now() - data.RESULTS_AGE).total_seconds() > data.DATA_TIMEOUT):
     update_results()
   o, e, t = calc_record()
-  resp = {
-    'on-time': o,
-    'early': e,
-    'total': t
-  }
-  return flask.jsonify(resp)
+  if 'plaintext' in flask.request.args:
+    return f"itswill has been early {e} times, on time {o} times, and late {t-o-e} times."
+  else:
+    resp = {
+      'on-time': o,
+      'early': e,
+      'total': t
+    }
+    return flask.jsonify(resp)
 
 @app.route('/api/v1/history', methods=['GET'])
 @cross_origin()
