@@ -130,3 +130,6 @@ dmypy.json
 
 # API Secrets
 secrets.json
+
+# Results
+results/
