@@ -34,18 +34,6 @@ def update_results():
 
   data.RESULTS_AGE = dt.datetime.now()
 
-def calc_record():
-  ontime = 0
-  early = 0
-  total = 0
-  for d, r in data.RESULTS.items():
-    total += 1
-    if r[0] == Punctuality.ONTIME:
-      ontime += 1
-    elif r[0] == Punctuality.EARLY:
-      early += 1
-  return (ontime, early, total)
-
 @app.route('/', methods=['GET'])
 @cross_origin()
 def home():
@@ -56,14 +44,21 @@ def home():
 def get_record():
   if (data.RESULTS_AGE is None) or ((dt.datetime.now() - data.RESULTS_AGE).total_seconds() > data.DATA_TIMEOUT):
     update_results()
-  o, e, t = calc_record()
+  o, e, t = calc_record(data.RESULTS)
+  status, streak = get_current_streak(data.RESULTS)
   if 'plaintext' in flask.request.args:
-    return f"itswill has been early {e} times, on time {o} times, and late {t-o-e} times."
+    return_str = f"itswill has been early {e} times, on time {o} times, and late {t-o-e} times."
+    if streak > 1:
+      status_str = status.name.lower()
+      return_str += f" He has been {status_str} {streak} times in a row."
+    return return_str
   else:
     resp = {
       'on-time': o,
       'early': e,
-      'total': t
+      'total': t,
+      'streak': streak,
+      'streak-status': status.value
     }
     return flask.jsonify(resp)
 

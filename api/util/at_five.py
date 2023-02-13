@@ -10,6 +10,7 @@ import csv
 from pathlib import Path
 import datetime as dt
 import pytz
+from string import Template
 from enum import Enum
 from util.twitch import TwitchAPI
 from util.twitch import TWITCH_API_TIME_FORMAT
@@ -25,6 +26,21 @@ class Punctuality(Enum):
     if self.__class__ is other.__class__:
       return self.value < other.value
     return NotImplemented
+
+class DeltaTemplate(Template):
+    delimiter = "%"
+
+def strfdelta(tdelta, fmt):
+    d = {"D": tdelta.days}
+    hours, rem = divmod(tdelta.seconds, 3600)
+    _, hours_12hr = divmod(hours, 12)
+    minutes, seconds = divmod(rem, 60)
+    d["H"] = '{:02d}'.format(hours)
+    d["h"] = '{}'.format(hours_12hr)
+    d["M"] = '{:02d}'.format(minutes)
+    d["S"] = '{:02d}'.format(seconds)
+    t = DeltaTemplate(fmt)
+    return t.substitute(**d)
 
 def utc_to_local(utc_dt, local_tz):
   return utc_dt.replace(tzinfo=dt.timezone.utc).astimezone(tz=local_tz)
@@ -49,7 +65,7 @@ def get_at_five_results(twitch_api, results_file, local_tz):
   with open(results_file, 'r', newline='', encoding='utf-8') as resultscsv:
     results_reader = csv.reader(resultscsv, delimiter=CSV_DELIM, quotechar=CSV_QUOTE)
     for row in results_reader:
-      at_five_results[row[0]] = (Punctuality(int(row[1])), row[2])
+      at_five_results[row[0]] = (Punctuality(int(row[1])), dt.datetime.strptime(row[2], "%H:%M:%S").time())
 
   vods = twitch_api.get_all_videos()
   for vod in vods:
@@ -71,3 +87,31 @@ def save_at_five_results(results, results_file):
     results_writer = csv.writer(resultscsv, delimiter=CSV_DELIM, quotechar=CSV_QUOTE, quoting=csv.QUOTE_MINIMAL)
     for k, v in results.items():
       results_writer.writerow([k, v[0].value, v[1]])
+
+def calc_record(results):
+  ontime = 0
+  early = 0
+  total = 0
+  for d, r in results.items():
+    total += 1
+    if r[0] == Punctuality.ONTIME:
+      ontime += 1
+    elif r[0] == Punctuality.EARLY:
+      early += 1
+  return (ontime, early, total)
+
+def get_current_streak(results):
+  status = Punctuality.EARLY
+  streak = 0
+
+  stream_dates = list(results.keys())
+  stream_dates.sort(reverse = True)
+  
+  status = results[stream_dates[0]][0]
+  for stream in stream_dates:
+    if status == results[stream][0]:
+      streak += 1
+    else:
+      break
+
+  return (status, streak)
