@@ -30,9 +30,21 @@ function populateRecord(text)
 {
   var respJson = JSON.parse(text);
 
+  var statusString = "late";
+  if (respJson['streak-status'] == 1)
+  {
+    statusString = "on time";
+  }
+  else if (respJson['streak-status'] == 2)
+  {
+    statusString = "early";
+  }
+
   var recordDiv = `itswill has been on time for {0} out of the {1} streams since January 1st, 2023.
   <br>
-  itswill has been early for {2} out of the {1} streams since January 1st, 2023`.format(respJson["on-time"], respJson["total"], respJson["early"]);
+  itswill has been early for {2} out of the {1} streams since January 1st, 2023
+  <br>
+  itswill has been {3} {4} times in a row.`.format(respJson["on-time"], respJson["total"], respJson["early"], statusString, respJson['streak']);
   $("#record").append(recordDiv);
 }
 
