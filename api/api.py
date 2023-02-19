@@ -16,10 +16,11 @@ from util.at_five import *
 class API_DataStore():
   TWITCH_API = None
   LOCAL_TZ = None
-  DATA_TIMEOUT = 300
+  DATA_TIMEOUT = 120
 
   RESULTS_FILEPATH = "./results.csv"
   RESULTS = dict()
+  IS_LIVE = False
   RESULTS_AGE = None
 
 data = API_DataStore()
@@ -31,6 +32,8 @@ app.config["CORS_HEADERS"] = 'Content-Type'
 def update_results():
   data.RESULTS = get_at_five_results(data.TWITCH_API, data.RESULTS_FILEPATH, data.LOCAL_TZ)
   save_at_five_results(data.RESULTS, data.RESULTS_FILEPATH)
+  
+  data.IS_LIVE = data.TWITCH_API.get_broadcaster_live()
 
   data.RESULTS_AGE = dt.datetime.now()
 
@@ -76,6 +79,15 @@ def get_history():
 
   resp = { 'streams': streams }
 
+  return flask.jsonify(resp)
+
+@app.route('/api/v1/live', methods=['GET'])
+@cross_origin()
+def get_live():
+  if (data.RESULTS_AGE is None) or ((dt.datetime.now() - data.RESULTS_AGE).total_seconds() > data.DATA_TIMEOUT):
+    update_results()
+    
+  resp = { 'live' : 1 if data.IS_LIVE else 0, 'waslive' : 1 if dt.datetime.now().date().strftime("%Y-%m-%d") in data.RESULTS else 0 }
   return flask.jsonify(resp)
 
 if __name__ == '__main__':

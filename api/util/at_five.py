@@ -46,9 +46,9 @@ def utc_to_local(utc_dt, local_tz):
   return utc_dt.replace(tzinfo=dt.timezone.utc).astimezone(tz=local_tz)
 
 def is_five(start_time):
-  if start_time < dt.time(16,45):
+  if start_time < dt.time(16,45,0):
     return Punctuality.EARLY
-  elif start_time >= dt.time(16,45) and start_time <= dt.time(17,15): 
+  elif start_time >= dt.time(16,45,0) and start_time <= dt.time(17,15,59): 
     return Punctuality.ONTIME
   else:
     return Punctuality.LATE

@@ -13,10 +13,10 @@ article {
   flex: 1;
 }
 
-#record {
+#record, #islive {
   font-weight: bold;
   font-size: 24px;
-  padding: 2vw;
+  padding: 1vw;
 }
 
 #history {

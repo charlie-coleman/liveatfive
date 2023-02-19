@@ -33,6 +33,22 @@ class TwitchAPI:
       self.DEFAULT_BROADCASTER_ID = broadcaster_id
     return broadcaster_id
 
+  def get_stream_info(self, broadcaster_id = "", live = True):
+    bid = broadcaster_id if broadcaster_id != "" else self.DEFAULT_BROADCASTER_ID
+
+    url = f"{self.API_URL}/streams/?user_id={bid}"
+    if live:
+      url += "&type=live"
+    headers = self.get_headers()
+    r = requests.get(url, headers=headers)
+    resp_json = r.json()
+    return resp_json['data']
+
+  def get_broadcaster_live(self, broadcaster_id = ""):
+    bid = broadcaster_id if broadcaster_id != "" else self.DEFAULT_BROADCASTER_ID
+    stream_info = self.get_stream_info(bid)
+    return (len(stream_info) > 0)
+
   def get_clips(self, limit = 10, broadcaster_id = "", start_time = None, end_time = None, after= ""):
     bid = broadcaster_id if broadcaster_id != "" else self.DEFAULT_BROADCASTER_ID
 
