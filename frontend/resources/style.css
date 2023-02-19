@@ -1,6 +1,17 @@
 body, html {
   font-family: sans-serif;
   margin: 0;
+  background-color: #313338;
+  color: #fff;
+}
+
+a, a:link, a:visited {
+  color: #00aff4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 body {
@@ -19,7 +30,7 @@ article {
   padding: 1vw;
 }
 
-#history {
+#history, #faq-block {
   padding-top: 0vh;
   margin-left: auto;
   margin-right: auto;
@@ -34,6 +45,23 @@ article {
 .history-entry {
   text-align: left;
   font-family: monospace;
+}
+
+.question {
+  text-align: left;
+  font-family: monospace;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.answer {
+  text-align: left;
+  font-family: monospace;
+  font-size: 12pt;
+}
+
+.answer-list {
+  padding-bottom: 12px;
 }
 
 .centered-div {
