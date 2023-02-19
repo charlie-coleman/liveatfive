@@ -2,7 +2,7 @@ var DateTime = luxon.DateTime;
 
 var apiUrl = "http://127.0.0.1:8080"
 var goalTime = DateTime.fromObject({ hour: 17, minute: 0, second: 0 }, { zone: "America/Los_Angeles"});
-var padTime = DateTime.fromObject({ hour: 17, minute: 15, second: 59 }, { zone: "America/Los_Angeles"});
+var padTime = DateTime.fromObject({ hour: 17, minute: 15, second: 0 }, { zone: "America/Los_Angeles"});
 
 var isLive = false;
 var wasLive = false;
