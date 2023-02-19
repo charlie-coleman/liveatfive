@@ -87,7 +87,8 @@ def get_live():
   if (data.RESULTS_AGE is None) or ((dt.datetime.now() - data.RESULTS_AGE).total_seconds() > data.DATA_TIMEOUT):
     update_results()
     
-  resp = { 'live' : 1 if data.IS_LIVE else 0, 'waslive' : 1 if dt.datetime.now().date().strftime("%Y-%m-%d") in data.RESULTS else 0 }
+  todays_date = utc_to_local(dt.datetime.now(), data.LOCAL_TZ).date()
+  resp = { 'live' : 1 if data.IS_LIVE else 0, 'waslive' : 1 if todays_date.strftime("%Y-%m-%d") in data.RESULTS else 0 }
   return flask.jsonify(resp)
 
 if __name__ == '__main__':
