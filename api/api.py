@@ -50,10 +50,11 @@ def get_record():
   o, e, t = calc_record(data.RESULTS)
   status, streak = get_current_streak(data.RESULTS)
   if 'plaintext' in flask.request.args:
-    return_str = f"itswill has been early {e} times, on time {o} times, and late {t-o-e} times."
+    return_str = f"{get_when_live(data)} He has been early {e} times, on time {o} times, and late {t-o-e} times."
     if streak > 1:
       status_str = status.name.lower()
       return_str += f" He has been {status_str} {streak} streams in a row."
+    
     return return_str
   else:
     resp = {
