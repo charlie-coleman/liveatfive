@@ -111,15 +111,16 @@ class AtFiveAPI():
     self._check_was_live()
     
   def update_results(self):
+    print("Updating results.")
+    
     self._fetch_twitch_data()
     self._save_data()
     self._check_is_live()
     self._check_was_live()
     
-    self.DATA_TIMESTAMP = dt.datetime.now()
-    
   def update_data_if_necessary(self):
     if (self.DATA_TIMESTAMP is None) or ((dt.datetime.now() - self.DATA_TIMESTAMP).total_seconds() > self.DATA_TIMEOUT):
+      self.DATA_TIMESTAMP = dt.datetime.now()
       self.update_results()
 
   def _is_five(self, start_time : dt.time):
@@ -184,8 +185,6 @@ class AtFiveAPI():
       statsfile.write(json.dumps(self.STATS, indent=2))
   
   def _check_is_live(self):
-    self.update_data_if_necessary()
-    
     self.IS_LIVE = self.TWITCH_API.is_broadcaster_live(self.USER_ID)
     
   def _check_was_live(self):
@@ -223,6 +222,8 @@ class AtFiveAPI():
     return (status, streak)
 
   def get_when_live(self):
+    self.update_data_if_necessary()
+    
     now = utc_to_local(dt.datetime.now(tz=dt.timezone.utc), self.LOCAL_TZ)
     whenLive = ""
     
