@@ -31,7 +31,7 @@ def get_record():
   if 'plaintext' in flask.request.args:
     return_str = f"{data.ATFIVE_API.get_when_live()} He has been early {e} times, on time {o} times, and late {t-o-e} times."
     if streak > 1:
-      status_str = status.name.lower()
+      status_str = Punctuality(status).name.lower()
       return_str += f" He has been {status_str} {streak} streams in a row."
     
     return return_str
