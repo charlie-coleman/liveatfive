@@ -1,0 +1,61 @@
+<html>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <title>Live at Five Stats</title>
+    <link rel="icon" href="../resources/favicon.ico">
+  </head>
+  <body>
+    <header>
+      <div class="centered-div" id="site-title">
+        <h1 class="headline">More Stats</h1>
+      </div>
+    </header>
+    <article>
+      <div class="centered-wrapper" id="other-stats">
+        <ul class="left-align-block" id="other-stats-list">
+          <li class="important-list-entry">Average time itswill goes live?</li>
+          <ul>
+            <li class="list-entry" id="avg-time"></li>
+          </ul>
+        </ul>
+      </div>
+      <div class="centered-wrapper" id="in-depth">
+        <h2 class="stat-header">History by weekday</h3>
+        <div id="config">
+          <select name="weekday" id="weekday-select">
+            <option value="-1">All</option>
+            <option value="0">Monday</option>
+            <option value="1">Tuesday</option>
+            <option value="2">Wednesday</option>
+            <option value="3">Thursday</option>
+            <option value="4" selected>Friday</option>
+            <option value="5">Saturday</option>
+            <option value="6">Sunday</option>
+          </select>
+        </div>
+        <div class="centered-div" id="record"></div>
+        <div class="left-align-block" id="history">
+          <table id="history-table">
+            <tr class="table-header">
+              <th>Date</th>
+              <th>Time</th>
+              <th>Offset</th>
+              <th>Status</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </article>
+    <footer class="centered-div" id="notes">
+      (PLEASE RESPECT THE 15 MINUTE BUFFER)
+      <br>
+      Go check out the stream <a href="https://twitch.tv/itswill">here.</a>
+      <br>
+      If you have questions see the <a href="../faq">FAQ.</a> Or head back to the <a href="../">homepage.</a>
+    </footer>
+  </body>
+  <link rel="stylesheet" type="text/css" href="../resources/style.css">
+  <script src="../resources/jquery-3.6.0.min.js"></script>
+  <script src="../resources/luxon.min.js"></script>
+  <script src="./resources/main.js"></script>
+</html>

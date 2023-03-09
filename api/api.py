@@ -26,8 +26,26 @@ def home():
 @app.route('/api/v1/record', methods=['GET'])
 @cross_origin()
 def get_record():
-  o, e, t = data.ATFIVE_API.calc_record()
-  status, streak = data.ATFIVE_API.get_current_streak()
+  weekday = -1
+  if 'weekday' in flask.request.args:
+    weekdaystr = flask.request.args['weekday'].lower()
+    if weekdaystr in ['m', 'mon', 'monday', '0']:
+      weekday = 0
+    elif weekdaystr in ['t', 'tues', 'tuesday', '1']:
+      weekday = 1
+    elif weekdaystr in ['w', 'wed', 'wednesday', '2']:
+      weekday = 2
+    elif weekdaystr in ['th', 'thurs', 'thursday', '3']:
+      weekday = 3
+    elif weekdaystr in ['f', 'fri', 'friday', '4']:
+      weekday = 4
+    elif weekdaystr in ['s', 'sat', 'saturday', '5']:
+      weekday = 5
+    elif weekdaystr in ['su', 'sun', 'sunday', '6']:
+      weekday = 6
+    
+  o, e, t = data.ATFIVE_API.get_record(day = weekday)
+  status, streak = data.ATFIVE_API.get_current_streak(day = weekday)
   if 'plaintext' in flask.request.args:
     return_str = f"{data.ATFIVE_API.get_when_live()} He has been early {e} times, on time {o} times, and late {t-o-e} times."
     if streak > 1:
@@ -50,13 +68,29 @@ def get_record():
 def get_history():
   data.ATFIVE_API.update_data_if_necessary()
   
-  streams = dict()
-  for k, v in data.ATFIVE_API.STATS.items():
-    streams[k] = dict()
-    streams[k]["on_time"] = v["on-time"]
-    streams[k]["time"] = dt.datetime.strptime(v['datetime'], TWITCH_API_TIME_FORMAT).strftime("%H:%M:%S")
-
-  resp = { 'streams': streams }
+  weekday = -1
+  if 'weekday' in flask.request.args:
+    weekdaystr = flask.request.args['weekday'].lower()
+    if weekdaystr in ['m', 'mon', 'monday', '0']:
+      weekday = 0
+    elif weekdaystr in ['t', 'tues', 'tuesday', '1']:
+      weekday = 1
+    elif weekdaystr in ['w', 'wed', 'wednesday', '2']:
+      weekday = 2
+    elif weekdaystr in ['th', 'thurs', 'thursday', '3']:
+      weekday = 3
+    elif weekdaystr in ['f', 'fri', 'friday', '4']:
+      weekday = 4
+    elif weekdaystr in ['s', 'sat', 'saturday', '5']:
+      weekday = 5
+    elif weekdaystr in ['su', 'sun', 'sunday', '6']:
+      weekday = 6
+  
+  resp = { 'streams': {} }
+  if weekday == -1:
+    resp['streams'] = data.ATFIVE_API.STATS
+  else:
+    resp['streams'] = dict(filter(lambda kvp: kvp[1]['weekday'] == weekday, data.ATFIVE_API.STATS.items()))
 
   return flask.jsonify(resp)
 
@@ -67,6 +101,12 @@ def get_live():
     
   resp = { 'live' : 1 if data.ATFIVE_API.IS_LIVE else 0, 'waslive' : 1 if data.ATFIVE_API.WAS_LIVE else 0 }
   return flask.jsonify(resp)
+
+@app.route('/api/v1/when', methods=['GET'])
+@cross_origin()
+def get_when():
+  avg_live_time = data.ATFIVE_API.get_average_live_time()
+  return { 'average': avg_live_time.strftime("%H:%M:%S") }
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()

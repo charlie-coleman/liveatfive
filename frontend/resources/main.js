@@ -71,11 +71,11 @@ function populateHistory(text)
 
     var liveString = ""
     
-    if (value["on_time"] == 2)
+    if (value["on-time"] == 2)
     {
       liveString = "EARLY&nbsp;&nbsp;"
     }
-    else if (value["on_time"] == 1)
+    else if (value["on-time"] == 1)
     {
       liveString = "ON TIME"
     }

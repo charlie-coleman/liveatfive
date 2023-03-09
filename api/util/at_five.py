@@ -173,6 +173,8 @@ class AtFiveAPI():
           self.STATS[vod_date] = {
             "offset": (offset_seconds / 60.0),
             "on-time": self._is_five(vod_dt.time()).value,
+            "time": vod_dt.strftime("%H:%M:%S"),
+            "weekday": vod_dt.weekday(),
             "datetime": vod_dt.strftime(TWITCH_API_TIME_FORMAT)
           }
         
@@ -191,33 +193,34 @@ class AtFiveAPI():
     now = utc_to_local(dt.datetime.now(tz=dt.timezone.utc), self.LOCAL_TZ)
     self.WAS_LIVE = (now.strftime("%Y-%m-%d") in self.STATS)
 
-  def calc_record(self):
+  def get_record(self, day = -1):
     self.update_data_if_necessary()
     
     ontime = 0
     early = 0
     total = 0
     for _, stats in self.STATS.items():
-      total += 1
-      if stats["on-time"] == Punctuality.ONTIME:
-        ontime += 1
-      elif stats["on-time"] == Punctuality.EARLY:
-        early += 1
+      if day == -1 or day == stats['weekday']:
+        total += 1
+        if stats["on-time"] == Punctuality.ONTIME:
+          ontime += 1
+        elif stats["on-time"] == Punctuality.EARLY:
+          early += 1
     return (ontime, early, total)
 
-  def get_current_streak(self):
+  def get_current_streak(self, day=-1):
     self.update_data_if_necessary()
     
     status = 0
     streak = 0
-    
-    for __, stats in self.STATS.items():
-      if streak == 0:
-        status = stats["on-time"]
-      if status == stats["on-time"]:
-        streak += 1
-      else:
-        break
+    for _, stats in self.STATS.items():
+      if day == -1 or day == stats['weekday']:
+        if streak == 0:
+          status = stats["on-time"]
+        if status == stats["on-time"]:
+          streak += 1
+        else:
+          break
 
     return (status, streak)
 
@@ -244,4 +247,15 @@ class AtFiveAPI():
       whenLive = f"itswill should've been live {timeStr} ago."
     
     return whenLive
+  
+  def get_average_live_time(self):
+    self.update_data_if_necessary()
+    
+    total_offset = 0
+    for _, v in self.STATS.items():
+      total_offset += v['offset']
+    avg_offset = total_offset / len(self.STATS.items())
+    
+    delta = dt.timedelta(seconds = 60 * avg_offset)
+    return (dt.datetime.combine(dt.date.today(), self.GOAL_TIME) + delta).time()
   
